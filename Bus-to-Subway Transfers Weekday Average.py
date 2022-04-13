@@ -1,28 +1,10 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import pandas as pd
-
-
-# In[2]:
-
 
 # Read linked trips csv
 linked_df = pd.read_csv(r'nyc-travel-surveys-Linkedcsv.csv')
 
-
-# In[3]:
-
-
 # Print sample of data 
 linked_df.head()
-
-
-# In[27]:
-
 
 # Remove unnecessary columns to speed up runtime
 # Filter values are based on the information found in the final report https://new.mta.info/document/28971
@@ -86,17 +68,9 @@ columns = ['hhid',
 
 linkedtrips_df = linked_df[columns]
 
-
-# In[28]:
-
-
 # Filter only by trips during the week and using both bus and subway
 weekday = ['Monday','Tuesday','Wednesday','Thursday','Friday']
 weekdaytrips = linkedtrips_df[(linkedtrips_df['traveldate_dow'].isin(weekday)) & (linkedtrips_df['mode_g5'] == 'Subway + Bus')]
-
-
-# In[29]:
-
 
 def checkorder(listofvalues, val1, val2): # Function to check whether value 1 comes before value 2. 0 == False, 1 == True 
     if val1 not in listofvalues or val2 not in listofvalues:
@@ -107,10 +81,6 @@ def checkorder(listofvalues, val1, val2): # Function to check whether value 1 co
         if val2 in listofvalues[i:]:
             flag = 1
         return flag        
-
-
-# In[30]:
-
 
 # Write filtered dataframe to dictionary for iterating
 wkdaytrips_dict = weekdaytrips.to_dict('records')
@@ -126,36 +96,13 @@ for row in wkdaytrips_dict:
 # Write the dictionary to a DataFrame
 wkdaytransfer_df = pd.DataFrame.from_dict(wkdaytrips_dict)
 
-
-# In[31]:
-
-
 # Filter trips to only bus to subway transfers
 filteredtrips_df = wkdaytransfer_df[wkdaytransfer_df['BusToSubwayTransfer'] == 1]
 
-
-# In[43]:
-
-
 subwayboardingsfrombus = filteredtrips_df.groupby('subway_board_stop_name')['per_weight_wd_trips_rsadj'].sum()
-
-
-# In[48]:
-
 
 totalweekday = subwayboardingsfrombus.reset_index()
 totalweekday['averageboardings_wkday'] = totalweekday['per_weight_wd_trips_rsadj']/5
 
-
-# In[49]:
-
-
 outputname = 'Average_Weekday_Boardings_From_Bus_To_Subway.csv'
 totalweekday.to_csv(outputname)
-
-
-# In[ ]:
-
-
-
-
